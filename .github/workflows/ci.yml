@@ -1,0 +1,27 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Sintaxe dos módulos JS
+        run: |
+          for f in js/*.js js/pages/*.js; do
+            node --check "$f"
+            echo "OK: $f"
+          done
+      - name: Estrutura mínima do app
+        run: |
+          test -f index.html
+          test -f css/styles.css
+          test -f js/store.js
+          grep -q 'vertice_state_v1' js/store.js
+          echo "Estrutura OK"
