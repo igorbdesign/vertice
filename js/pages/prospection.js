@@ -25,8 +25,8 @@ const DIAG_FIX = {
 };
 
 const scoreClass = s => s >= 60 ? 'score-high' : s >= 30 ? 'score-mid' : 'score-low';
-const mainProblem = l => (l.issues || []).length ? SITE_ISSUES[l.issues[0]].label : (l.audited ? 'site saudável' : 'não analisado');
-function issueLabel(k) { return SITE_ISSUES[k] ? SITE_ISSUES[k].label : k; }
+const mainProblem = l => (l.issues || []).length ? issueLabel(l.issues[0]) : (l.audited ? 'site saudável' : 'não analisado');
+function issueLabel(k) { return SITE_ISSUES[k] ? SITE_ISSUES[k].label : 'problema no site'; }
 
 function buildDiagnosis(lead) {
   const issues = lead.issues || [];
