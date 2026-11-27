@@ -4,13 +4,22 @@ const UI = {
     const root = document.getElementById('modalRoot');
     const ov = document.createElement('div');
     ov.className = 'modal-overlay';
+    const md = document.createElement('div');
+    md.className = 'modal' + (opts.lg ? ' lg' : '');
     try {
-      ov.innerHTML = `<div class="modal ${opts.lg ? 'lg' : ''}">
-        <div class="modal-head"><h2>${esc(opts.title || '')}</h2>
-          <button class="icon-btn" data-close>✕</button></div>
-        <div class="modal-body">${opts.body || ''}</div>
-        ${opts.foot ? '<div class="modal-foot"></div>' : ''}
-      </div>`;
+      const head = document.createElement('div');
+      head.className = 'modal-head';
+      const h2 = document.createElement('h2');
+      h2.textContent = opts.title || '';
+      const x = document.createElement('button');
+      x.className = 'icon-btn'; x.setAttribute('data-close', ''); x.textContent = '✕';
+      head.appendChild(h2); head.appendChild(x);
+      const body = document.createElement('div');
+      body.className = 'modal-body';
+      body.innerHTML = opts.body || '';
+      md.appendChild(head); md.appendChild(body);
+      if (opts.foot) { const f = document.createElement('div'); f.className = 'modal-foot'; md.appendChild(f); }
+      ov.appendChild(md);
     } catch (e) {
       console.error('Modal body:', e);
       ov.innerHTML = `<div class="modal"><div class="modal-head"><h2>Erro</h2><button class="icon-btn" data-close>✕</button></div>
@@ -18,7 +27,8 @@ const UI = {
     }
     root.appendChild(ov);
     ov.addEventListener('mousedown', e => { if (e.target === ov) UI.closeModal(ov); });
-    ov.querySelector('[data-close]').onclick = () => UI.closeModal(ov);
+    const xb = ov.querySelector('[data-close]');
+    if (xb) xb.onclick = () => UI.closeModal(ov);
     const foot = ov.querySelector('.modal-foot');
     if (foot && opts.foot) {
       try { opts.foot(foot, ov); }
@@ -28,6 +38,17 @@ const UI = {
       try { opts.onMount(ov, ov); }
       catch (e) { console.error('Modal onMount:', e); UI.toast('Erro ao abrir: ' + e.message, true); }
     }
+    setTimeout(() => {
+      if (!ov.isConnected) return;
+      const b = ov.querySelector('.modal-body');
+      if (b && !b.children.length && !b.textContent.trim()) {
+        b.innerHTML = `<div style="padding:18px;text-align:center">
+          <p style="font-weight:700;margin-bottom:8px">⚠️ Esta janela não conseguiu renderizar</p>
+          <p style="font-size:12.5px;color:var(--muted)">Navegador: ${esc((navigator.userAgent || '').slice(0, 80))}<br>Versão do app: v${UI.version}<br>Recarregue com Ctrl+Shift+R. Se persistir, envie um print desta janela.</p>
+          <button class="btn" style="margin-top:12px" onclick="this.closest('.modal-overlay').remove()">Fechar</button>
+        </div>`;
+      }
+    }, 1200);
     return ov;
   },
   closeModal(ov) { (ov || document.querySelector('.modal-overlay'))?.remove(); },
@@ -74,6 +95,7 @@ const UI = {
       <span class="spacer"></span>${actionsHtml || ''}</div>`;
   }
 };
+UI.version = 5;
 
 /* ===== Charts (Chart.js wrapper) ===== */
 const Charts = {

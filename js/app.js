@@ -59,6 +59,11 @@ const App = {
       if (item && item.dataset.nav) { dd.hidden = true; App.go(item.dataset.nav); }
     });
     this.updateAlertBadge();
+    const vEl = document.getElementById('appVersion');
+    if (vEl) vEl.textContent = 'Vértice v' + (window.UI ? UI.version : '?');
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') UI.closeModal();
+    });
     this.go('dashboard');
   }
 };
