@@ -15,7 +15,7 @@ Pages.clients = function () {
       const contracts = Store.data.contracts.filter(x => x.clientId === c.id).length;
       return `<div class="card cli-card" data-id="${c.id}" style="cursor:pointer">
         <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px">
-          <div style="width:42px;height:42px;border-radius:12px;background:var(--accent-dim);color:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px">${esc((c.name || '?')[0].toUpperCase())}</div>
+          <div style="width:42px;height:42px;border-radius:12px;background:var(--accent-dim);color:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px">${esc(String(c.name || '?').trim()[0] || '?').toUpperCase()}</div>
           <div style="min-width:0">
             <b style="font-size:14px">${esc(c.name)}</b>
             <div class="muted" style="font-size:11.5px">${esc(c.company || c.niche || '')} ${c.city ? '· ' + esc(c.city) : ''}</div>

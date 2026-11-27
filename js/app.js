@@ -28,6 +28,9 @@ const App = {
   init() {
     Store.load();
     Charts.applyDefaults();
+    window.addEventListener('error', e => {
+      if (e && e.message) UI.toast('Erro: ' + e.message, true);
+    });
     Sidebar.render();
     document.getElementById('todayLabel').textContent =
       new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });

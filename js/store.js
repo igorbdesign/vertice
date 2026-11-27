@@ -43,6 +43,8 @@ const Store = {
       moments: [],
       prospection: {
         leads: [],
+        results: [],
+        lastSearch: null,
         stages: [
           { id: 'f1', title: '📌 Novo lead' },
           { id: 'f2', title: '💬 Primeiro contato' },
@@ -60,6 +62,7 @@ const Store = {
       settings: {
         navOrder: ['dashboard','tasks','clients','contracts','services','finance','goals','habits','wishlist','projects','calendar','moments','prospection','content'],
         sidebarCollapsed: false,
+        placesKey: '',
         alertRules: { tasksOverdue: { enabled: true, everyDays: 2 } },
         alertRead: []
       }

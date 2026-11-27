@@ -252,7 +252,8 @@ function contractWizard(existing) {
 }
 
 function setupSignature(canvas, getSig) {
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext ? canvas.getContext('2d') : null;
+  if (!ctx) return;
   ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.strokeStyle = '#1a1a2e';
   function pos(e) {
     const r = canvas.getBoundingClientRect();

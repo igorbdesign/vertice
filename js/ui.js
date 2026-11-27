@@ -4,18 +4,30 @@ const UI = {
     const root = document.getElementById('modalRoot');
     const ov = document.createElement('div');
     ov.className = 'modal-overlay';
-    ov.innerHTML = `<div class="modal ${opts.lg ? 'lg' : ''}">
-      <div class="modal-head"><h2>${esc(opts.title || '')}</h2>
-        <button class="icon-btn" data-close>✕</button></div>
-      <div class="modal-body">${opts.body || ''}</div>
-      ${opts.foot === false ? '' : `<div class="modal-foot"></div>`}
-    </div>`;
+    try {
+      ov.innerHTML = `<div class="modal ${opts.lg ? 'lg' : ''}">
+        <div class="modal-head"><h2>${esc(opts.title || '')}</h2>
+          <button class="icon-btn" data-close>✕</button></div>
+        <div class="modal-body">${opts.body || ''}</div>
+        ${opts.foot ? '<div class="modal-foot"></div>' : ''}
+      </div>`;
+    } catch (e) {
+      console.error('Modal body:', e);
+      ov.innerHTML = `<div class="modal"><div class="modal-head"><h2>Erro</h2><button class="icon-btn" data-close>✕</button></div>
+        <div class="modal-body"><p>Algo deu errado ao abrir esta janela: ${esc(e.message)}</p></div></div>`;
+    }
     root.appendChild(ov);
     ov.addEventListener('mousedown', e => { if (e.target === ov) UI.closeModal(ov); });
     ov.querySelector('[data-close]').onclick = () => UI.closeModal(ov);
     const foot = ov.querySelector('.modal-foot');
-    if (foot && opts.foot) opts.foot(foot, ov);
-    if (opts.onMount) opts.onMount(ov);
+    if (foot && opts.foot) {
+      try { opts.foot(foot, ov); }
+      catch (e) { console.error('Modal foot:', e); UI.toast('Erro nos botões do modal: ' + e.message, true); }
+    }
+    if (opts.onMount) {
+      try { opts.onMount(ov, ov); }
+      catch (e) { console.error('Modal onMount:', e); UI.toast('Erro ao abrir: ' + e.message, true); }
+    }
     return ov;
   },
   closeModal(ov) { (ov || document.querySelector('.modal-overlay'))?.remove(); },

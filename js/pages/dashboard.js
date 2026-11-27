@@ -130,7 +130,6 @@ function topLeads() {
       <small class="muted" style="display:block">${esc(l.niche)} · ${esc(l.city)} · ${esc(stageOf(l))}</small></span>
   </div>`).join('');
 }
-function scoreClass(s) { return s >= 60 ? 'score-high' : s >= 30 ? 'score-mid' : 'score-low'; }
 function stageOf(l) {
   const st = Store.data.prospection.stages.find(s => s.id === l.stage);
   return st ? st.title.replace(/^\S+\s/, '') : '';
