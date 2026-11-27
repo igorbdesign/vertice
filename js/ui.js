@@ -90,7 +90,7 @@ const UI = {
       <span class="spacer"></span>${actionsHtml || ''}</div>`;
   }
 };
-UI.version = 5;
+UI.version = 7;
 
 /* ===== Charts (Chart.js wrapper) ===== */
 const Charts = {
