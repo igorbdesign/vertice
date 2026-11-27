@@ -29,7 +29,12 @@ const App = {
     Store.load();
     Charts.applyDefaults();
     window.addEventListener('error', e => {
+      App.lastError = (e && (e.message + ' @ ' + (e.filename || '').split('/').pop() + ':' + e.lineno)) || '';
       if (e && e.message) UI.toast('Erro: ' + e.message, true);
+    });
+    window.addEventListener('unhandledrejection', e => {
+      const m = e && e.reason && e.reason.message ? e.reason.message : String(e && e.reason);
+      App.lastError = 'Promise: ' + m;
     });
     Sidebar.render();
     document.getElementById('todayLabel').textContent =
@@ -63,8 +68,38 @@ const App = {
     if (vEl) vEl.textContent = 'Vértice v' + (window.UI ? UI.version : '?');
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') UI.closeModal();
+      if (e.altKey && (e.key === 'd' || e.key === 'D')) App.diagnostics();
     });
     this.go('dashboard');
+  },
+  diagnostics() {
+    const cssOk = (() => {
+      const d = document.createElement('div'); d.className = 'modal-overlay'; d.style.cssText = 'position:absolute;visibility:hidden';
+      document.body.appendChild(d);
+      const pos = getComputedStyle(d).position;
+      d.remove();
+      return pos === 'fixed' ? 'sim' : 'NÃO (CSS não carregado!)';
+    })();
+    const globals = ['Store', 'UI', 'Alerts', 'Sidebar', 'Charts', 'Finance', 'Pages', 'App']
+      .map(g => g + ': ' + (window[g] ? '✓' : '✗')).join(' | ');
+    const btns = document.querySelectorAll('.btn').length;
+    UI.modal({
+      title: 'Diagnóstico do app (v' + UI.version + ')',
+      body: `<div style="font-size:13px;line-height:1.9">
+        <b>Versão:</b> v${UI.version}<br>
+        <b>URL:</b> ${esc(location.href)}<br>
+        <b>Navegador:</b> ${esc(navigator.userAgent)}<br>
+        <b>CSS carregado:</b> ${cssOk}<br>
+        <b>Módulos:</b> ${esc(globals)}<br>
+        <b>Página atual:</b> ${esc(App.current)} · ${btns} botões na tela<br>
+        <b>Último erro:</b> ${esc(App.lastError || 'nenhum')}<br>
+        <b>Chart.js:</b> ${typeof Chart !== 'undefined' ? '✓' : '✗ (sem internet ou bloqueado)'}
+      </div>`,
+      foot(f, ov) {
+        f.innerHTML = '<button class="btn ghost" data-c>Fechar</button>';
+        f.querySelector('[data-c]').onclick = () => UI.closeModal(ov);
+      }
+    });
   }
 };
 window.addEventListener('DOMContentLoaded', () => App.init());

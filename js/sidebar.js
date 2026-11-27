@@ -59,3 +59,5 @@ const Sidebar = {
     b.style.color = on ? 'var(--accent-soft)' : '';
   }
 };
+
+window.Sidebar = Sidebar;

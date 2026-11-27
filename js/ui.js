@@ -1,35 +1,41 @@
 /* ===== Vértice — UI helpers ===== */
 const UI = {
   modal(opts) {
-    const root = document.getElementById('modalRoot');
+    let root = document.getElementById('modalRoot');
+    if (!root) { root = document.createElement('div'); root.id = 'modalRoot'; document.body.appendChild(root); }
+    const IN = 'box-sizing:border-box;margin:0;font-family:inherit;';
     const ov = document.createElement('div');
     ov.className = 'modal-overlay';
+    ov.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(10,9,14,.72);z-index:99998;display:flex;align-items:center;justify-content:center;padding:24px;';
     const md = document.createElement('div');
     md.className = 'modal' + (opts.lg ? ' lg' : '');
-    try {
-      const head = document.createElement('div');
-      head.className = 'modal-head';
-      const h2 = document.createElement('h2');
-      h2.textContent = opts.title || '';
-      const x = document.createElement('button');
-      x.className = 'icon-btn'; x.setAttribute('data-close', ''); x.textContent = '✕';
-      head.appendChild(h2); head.appendChild(x);
-      const body = document.createElement('div');
-      body.className = 'modal-body';
-      body.innerHTML = opts.body || '';
-      md.appendChild(head); md.appendChild(body);
-      if (opts.foot) { const f = document.createElement('div'); f.className = 'modal-foot'; md.appendChild(f); }
-      ov.appendChild(md);
-    } catch (e) {
-      console.error('Modal body:', e);
-      ov.innerHTML = `<div class="modal"><div class="modal-head"><h2>Erro</h2><button class="icon-btn" data-close>✕</button></div>
-        <div class="modal-body"><p>Algo deu errado ao abrir esta janela: ${esc(e.message)}</p></div></div>`;
-    }
+    md.style.cssText = IN + 'background:#1e1d26;color:#e8e6ef;border:1px solid #37344a;border-radius:16px;width:100%;max-width:' + (opts.lg ? '820' : '560') + 'px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 8px 24px rgba(0,0,0,.35);overflow:hidden;';
+    const head = document.createElement('div');
+    head.className = 'modal-head';
+    head.style.cssText = IN + 'display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #2c2a38;flex-shrink:0;';
+    const h2 = document.createElement('h2');
+    h2.textContent = opts.title || '';
+    h2.style.cssText = IN + 'font-size:15px;font-weight:700;color:#e8e6ef;';
+    const x = document.createElement('button');
+    x.className = 'icon-btn'; x.setAttribute('data-close', ''); x.textContent = '✕';
+    x.style.cssText = IN + 'background:transparent;border:none;color:#9b97ab;font-size:15px;cursor:pointer;padding:4px 8px;border-radius:8px;';
+    x.onmouseenter = () => x.style.color = '#e8e6ef';
+    x.onmouseleave = () => x.style.color = '#9b97ab';
+    head.appendChild(h2); head.appendChild(x);
+    const body = document.createElement('div');
+    body.className = 'modal-body';
+    body.style.cssText = IN + 'padding:18px 20px;overflow-y:auto;font-size:13.5px;';
+    const foot = document.createElement('div');
+    foot.className = 'modal-foot';
+    foot.style.cssText = IN + 'padding:14px 20px;border-top:1px solid #2c2a38;display:flex;justify-content:flex-end;gap:10px;flex-shrink:0;';
+    try { body.innerHTML = opts.body || ''; }
+    catch (e) { body.innerHTML = '<p>Erro ao montar o conteúdo: ' + esc(e.message) + '</p>'; }
+    md.appendChild(head); md.appendChild(body);
+    if (opts.foot) md.appendChild(foot);
+    ov.appendChild(md);
     root.appendChild(ov);
     ov.addEventListener('mousedown', e => { if (e.target === ov) UI.closeModal(ov); });
-    const xb = ov.querySelector('[data-close]');
-    if (xb) xb.onclick = () => UI.closeModal(ov);
-    const foot = ov.querySelector('.modal-foot');
+    x.onclick = () => UI.closeModal(ov);
     if (foot && opts.foot) {
       try { opts.foot(foot, ov); }
       catch (e) { console.error('Modal foot:', e); UI.toast('Erro nos botões do modal: ' + e.message, true); }
@@ -38,17 +44,6 @@ const UI = {
       try { opts.onMount(ov, ov); }
       catch (e) { console.error('Modal onMount:', e); UI.toast('Erro ao abrir: ' + e.message, true); }
     }
-    setTimeout(() => {
-      if (!ov.isConnected) return;
-      const b = ov.querySelector('.modal-body');
-      if (b && !b.children.length && !b.textContent.trim()) {
-        b.innerHTML = `<div style="padding:18px;text-align:center">
-          <p style="font-weight:700;margin-bottom:8px">⚠️ Esta janela não conseguiu renderizar</p>
-          <p style="font-size:12.5px;color:var(--muted)">Navegador: ${esc((navigator.userAgent || '').slice(0, 80))}<br>Versão do app: v${UI.version}<br>Recarregue com Ctrl+Shift+R. Se persistir, envie um print desta janela.</p>
-          <button class="btn" style="margin-top:12px" onclick="this.closest('.modal-overlay').remove()">Fechar</button>
-        </div>`;
-      }
-    }, 1200);
     return ov;
   },
   closeModal(ov) { (ov || document.querySelector('.modal-overlay'))?.remove(); },
@@ -146,3 +141,5 @@ const Charts = {
     });
   }
 };
+
+window.UI = UI; window.Charts = Charts;

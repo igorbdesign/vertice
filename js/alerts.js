@@ -119,3 +119,5 @@ const Alerts = {
     });
   }
 };
+
+window.Alerts = Alerts;

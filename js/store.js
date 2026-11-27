@@ -166,3 +166,5 @@ const ContractTemplate = {
   ],
   footer: `\nE, por estarem justas e contratadas, as partes assinam o presente instrumento em 2 (duas) vias de igual teor e forma.\n\n{{cidadecontrato}}, {{datacontrato}}.\n\n\n________________________________\nCONTRATADO(A): {{contratado}}\n\n________________________________\nCONTRATANTE: {{contratante}}`
 };
+
+window.Store = Store; window.Finance = Finance; window.ContractTemplate = ContractTemplate;
