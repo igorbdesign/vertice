@@ -3,6 +3,7 @@ const UI = {
   modal(opts) {
     let root = document.getElementById('modalRoot');
     if (!root) { root = document.createElement('div'); root.id = 'modalRoot'; document.body.appendChild(root); }
+    document.querySelectorAll('.modal-overlay').forEach(o => o.remove());
     const IN = 'box-sizing:border-box;margin:0;font-family:inherit;';
     const ov = document.createElement('div');
     ov.className = 'modal-overlay';
@@ -44,6 +45,18 @@ const UI = {
       try { opts.onMount(ov, ov); }
       catch (e) { console.error('Modal onMount:', e); UI.toast('Erro ao abrir: ' + e.message, true); }
     }
+    setTimeout(() => {
+      if (!ov.isConnected) return;
+      const b = ov.querySelector('.modal-body');
+      if (b && !b.children.length && !b.textContent.trim()) {
+        b.style.cssText += 'padding:20px;text-align:center;';
+        b.innerHTML = `<p style="font-weight:700;font-size:14px;margin-bottom:10px">⚠️ Esta janela não conseguiu renderizar o conteúdo</p>
+          <p style="font-size:12.5px;color:#9b97ab;line-height:1.8">App v${UI.version}<br>${esc((navigator.userAgent || '').slice(0, 90))}<br>Último erro: ${esc(App && App.lastError ? App.lastError : 'nenhum registrado')}</p>
+          <button data-dclose style="margin-top:14px;padding:8px 18px;border:none;border-radius:8px;background:#a78bfa;color:#17141f;font-weight:600;cursor:pointer">Fechar</button>`;
+        const dc = b.querySelector('[data-dclose]');
+        if (dc) dc.onclick = () => UI.closeModal(ov);
+      }
+    }, 1500);
     return ov;
   },
   closeModal(ov) { (ov || document.querySelector('.modal-overlay'))?.remove(); },

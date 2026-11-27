@@ -65,7 +65,15 @@ const App = {
     });
     this.updateAlertBadge();
     const vEl = document.getElementById('appVersion');
-    if (vEl) vEl.textContent = 'Vértice v' + (window.UI ? UI.version : '?');
+    if (vEl) {
+      vEl.textContent = 'Vértice v' + (window.UI ? UI.version : '?');
+      vEl.style.cursor = 'pointer';
+      vEl.title = 'Clique para diagnóstico';
+      vEl.onclick = () => App.diagnostics();
+    }
+    document.addEventListener('click', e => {
+      App.lastClick = (e.target.tagName || '') + (e.target.id ? '#' + e.target.id : '') + (e.target.className && typeof e.target.className === 'string' ? '.' + e.target.className.split(' ').join('.') : '');
+    }, true);
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') UI.closeModal();
       if (e.altKey && (e.key === 'd' || e.key === 'D')) App.diagnostics();
@@ -92,6 +100,7 @@ const App = {
         <b>CSS carregado:</b> ${cssOk}<br>
         <b>Módulos:</b> ${esc(globals)}<br>
         <b>Página atual:</b> ${esc(App.current)} · ${btns} botões na tela<br>
+        <b>Último clique:</b> ${esc(App.lastClick || 'nenhum ainda')}<br>
         <b>Último erro:</b> ${esc(App.lastError || 'nenhum')}<br>
         <b>Chart.js:</b> ${typeof Chart !== 'undefined' ? '✓' : '✗ (sem internet ou bloqueado)'}
       </div>`,
